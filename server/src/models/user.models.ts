@@ -2,27 +2,6 @@ import mongoose, { Schema } from "mongoose";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import crypto, { hash } from "node:crypto";
-import type { Document } from "mongoose";
-
-export interface UserDocument extends Document {
-  username: string;
-  email: string;
-  password: string;
-  isEmailVerified: boolean;
-  refreshToken?: string | null;
-  forgotPasswordToken?: string | null;
-  forgotPasswordTokenExpiry?: Date | null;
-  emailVerificationToken?: string | null;
-  emailVerificationTokenExpiry?: Date | null;
-  isPasswordMatch(password: string): Promise<boolean>;
-  generateAccessToken(): Promise<string>;
-  generateRefreshToken(): Promise<string>;
-  generateTemporaryToken(): Promise<{
-    unhashedToken: string;
-    hashedToken: string;
-    tokenExpire: Date;
-  }>;
-}
 
 const UserSchema = new Schema(
   {
@@ -133,4 +112,4 @@ UserSchema.methods.generateTemporaryToken = async function (): Promise<{
   return { unhashedToken, hashedToken, tokenExpire };
 };
 
-export const users = mongoose.model<UserDocument>("users", UserSchema);
+export const users = mongoose.model<Mongoose.UserDocument>("users", UserSchema);
