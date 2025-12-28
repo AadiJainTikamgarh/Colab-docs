@@ -42,7 +42,7 @@ const changePasswordValidator = () => {
   ];
 };
 
-const forgotPasswordRequest = () => {
+const forgotPasswordRequestValidator = () => {
   return [
     body("newPassword")
       .trim()
@@ -61,5 +61,5 @@ export {
   registerValidator,
   loginValidator,
   changePasswordValidator,
-  forgotPasswordRequest,
+  forgotPasswordRequestValidator,
 };

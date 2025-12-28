@@ -9,7 +9,9 @@ import {
 import {
   changePasswordService,
   forgotPasswordRequestService,
+  getCurrentUserService,
   loginService,
+  logoutService,
   refreshAccessTokenService,
   registerService,
   resendEmailVerificationMailService,
@@ -23,7 +25,6 @@ const registerUser = asyncHandler(async (req: Request, res: Response) => {
     email,
     password,
   }: { username: string; email: string; password: string } = await req.body;
-
 
   const { user, unhashedToken } = await registerService(
     username,
@@ -171,7 +172,29 @@ const changePassword = asyncHandler(async (req: Request, res: Response) => {
     .json(new ApiResponse(200, "Password updated successfully", { user }));
 });
 
+const currentUser = asyncHandler(async (req: Request, res: Response) => {
+  const { _id } = req?.user as { _id: string };
+  const { user } = await getCurrentUserService(_id);
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, "Current user fetched successfully", { user }));
+});
+
+const logout = asyncHandler(async (req: Request, res: Response) => {
+  const { _id } = req?.user as { _id: string };
+  await logoutService(_id);
+
+  return res
+    .cookie("refreshToken", "", { maxAge: 1 })
+    .cookie("accessToken", "", { maxAge: 1 })
+    .status(200)
+    .json(new ApiResponse(200, "User logged out successfully"));
+});
+
 export {
+  currentUser,
+  logout,
   registerUser,
   login,
   refreshAccessToken,

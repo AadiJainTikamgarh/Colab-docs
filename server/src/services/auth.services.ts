@@ -64,6 +64,38 @@ const registerService = async (
   return { user, unhashedToken };
 };
 
+const getCurrentUserService = async (userId: string) => {
+  if (!userId) {
+    throw new ApiError(401, "Unauthorized Request");
+  }
+
+  const user = await users
+    .findById(userId)
+    .select(
+      "-password -refreshToken -forgotPasswordToken -forgotPasswordTokenExpiry -emailVerificationToken -emailVerificationTokenExpiry"
+    );
+
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+  return { user };
+};
+
+const logoutService = async (userId: string) => {
+  if (!userId) {
+    throw new ApiError(401, "Unauthorized Request");
+  }
+  const user = await users.findById(userId);
+
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+
+  user.refreshToken = null;
+  await user.save({ validateBeforeSave: false });
+  return;
+};
+
 const loginService = async (email: string, password: string) => {
   if (!email || !password) {
     throw new ApiError(404, "All fields are required");
@@ -270,6 +302,8 @@ const changePasswordService = async (
 };
 
 export {
+  getCurrentUserService,
+  logoutService,
   registerService,
   loginService,
   refreshAccessTokenService,
