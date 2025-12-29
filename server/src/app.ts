@@ -11,25 +11,21 @@ app.use(cookieParser());
 
 app.use(
   cors({
-    origin: process.env.CORS_ORIGIN || "*",
+    origin: process.env.CORS_ORIGIN || ["http://localhost:5173"],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
-app.use((req, res, next) => {
-  res.setHeader(
-    "Content-Security-Policy",
-    "default-src 'self'; connect-src 'self' https://localhost:8000"
-  );
-  next();
-});
-
 import healthCheckRouter from "./routes/healthcheck.routes";
 import authRouter from "./routes/auth.routes";
+import { errorHandler } from "./middlewares/errorHandler.middleware";
 
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/healthcheck", healthCheckRouter);
+
+// Error handler middleware - must be after all routes
+app.use(errorHandler);
 
 export default app;

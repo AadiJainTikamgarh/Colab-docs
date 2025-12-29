@@ -28,7 +28,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     try {
       const res = await api.get("/auth/current-user");
       set({
-        user: res.data?.user,
+        user: res.data?.data?.user,
         isAuthenticated: true,
       });
     } catch (error) {
@@ -44,27 +44,39 @@ export const useAuthStore = create<AuthState>((set) => ({
   login: async (data: LoginPayload) => {
     set({ isLoading: true });
 
-    const res = await api.post("/auth/login", {
-      email: data.email,
-      password: data.password,
-    });
-
-    set({
-      user: res.data?.user,
-      isAuthenticated: true,
-    });
+    try {
+      const res = await api.post("/auth/login", {
+        email: data.email,
+        password: data.password,
+      });
+      console.log(res);
+      set({
+        user: res.data?.data?.user,
+        isAuthenticated: true,
+        isLoading: false,
+      });
+    } catch (error) {
+      set({ isLoading: false });
+      // console.log(error);
+      throw error; // Re-throw so Login.tsx can catch it
+    }
   },
 
   register: async (data: RegisterPayload) => {
     set({ isLoading: true });
 
-    await api.post("/auth/register", {
-      username: data.username,
-      email: data.email,
-      password: data.password,
-    });
+    try {
+      await api.post("/auth/register", {
+        username: data.username,
+        email: data.email,
+        password: data.password,
+      });
 
-    set({ isLoading: true });
+      set({ isLoading: false });
+    } catch (error) {
+      set({ isLoading: false });
+      throw error; // Re-throw so Register.tsx can catch it
+    }
   },
 
   logout: async () => {
@@ -83,15 +95,21 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   changePassword: async (data: ChangePasswordPayload) => {
     set({ isLoading: true });
-    const res = await api.post("/auth/change-password", {
-      oldPassword: data.oldPassword,
-      newPassword: data.newPassword,
-    });
 
-    set({
-      user: res.data?.user,
-      isAuthenticated: true,
-      isLoading: false,
-    });
+    try {
+      const res = await api.post("/auth/change-password", {
+        oldPassword: data.oldPassword,
+        newPassword: data.newPassword,
+      });
+
+      set({
+        user: res.data?.data?.user,
+        isAuthenticated: true,
+        isLoading: false,
+      });
+    } catch (error) {
+      set({ isLoading: false });
+      throw error; // Re-throw so component can catch it
+    }
   },
 }));
