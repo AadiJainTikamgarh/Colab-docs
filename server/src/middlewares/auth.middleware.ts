@@ -11,7 +11,7 @@ export const authorization = asyncHandler(
       req.headers?.authorization?.toString().split(" ")[1];
 
     if (!accessToken) {
-      throw new ApiError(401, "Unauthorized request");
+      throw new ApiError(401, "Token expired", ["TOKEN EXPIRED"]);
     }
 
     try {
