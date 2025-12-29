@@ -30,6 +30,8 @@ export const authorization = asyncHandler(
         throw new ApiError(401, "Unauthorized request");
       }
 
+      console.log(user);
+
       req.user = {
         _id: String(user._id),
       };

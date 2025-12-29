@@ -57,9 +57,14 @@ const forgotPasswordRequestValidator = () => {
   ];
 };
 
+const resendForgotPasswordMailValidator = () => {
+  return [body("email").trim().isEmail().withMessage("Email is Invalid")];
+};
+
 export {
   registerValidator,
   loginValidator,
   changePasswordValidator,
   forgotPasswordRequestValidator,
+  resendForgotPasswordMailValidator,
 };

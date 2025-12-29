@@ -78,7 +78,7 @@ UserSchema.methods.generateAccessToken = async function (): Promise<string> {
     },
     process.env.ACCESS_TOKEN_SECRET as string,
     {
-      expiresIn: process.env.ACCESS_TOKEN_EXPIRE as any,
+      expiresIn: process.env.ACCESS_TOKEN_EXPIRY as any,
     }
   );
 };

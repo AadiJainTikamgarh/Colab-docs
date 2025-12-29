@@ -27,7 +27,9 @@ app.use((req, res, next) => {
 });
 
 import healthCheckRouter from "./routes/healthcheck.routes";
+import authRouter from "./routes/auth.routes";
 
+app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/healthcheck", healthCheckRouter);
 
 export default app;

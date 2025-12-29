@@ -101,11 +101,7 @@ const loginService = async (email: string, password: string) => {
     throw new ApiError(404, "All fields are required");
   }
 
-  const existingUser = await users
-    .findOne({ email })
-    .select(
-      "-password -refreshToken -forgotPasswordToken -forgotPasswordTokenExpiry -emailVerificationToken -emailVerificationTokenExpiry"
-    );
+  const existingUser = await users.findOne({ email });
 
   if (!existingUser) {
     throw new ApiError(404, "User not found");
@@ -121,7 +117,13 @@ const loginService = async (email: string, password: string) => {
     String(existingUser._id)
   );
 
-  return { user: existingUser, refreshToken, accessToken };
+  const user = await users
+    .findById(existingUser._id)
+    .select(
+      "-password -refreshToken -forgotPasswordToken -forgotPasswordTokenExpiry -emailVerificationToken -emailVerificationTokenExpiry"
+    );
+
+  return { user, refreshToken, accessToken };
 };
 
 const refreshAccessTokenService = async (incommingToken: string) => {
@@ -241,13 +243,13 @@ const forgotPasswordRequestService = async (
   return;
 };
 
-const resendForgotPasswordService = async (userId: string) => {
-  if (!userId) {
-    throw new ApiError(401, "Unauthorized Request");
+const resendForgotPasswordService = async (email: string) => {
+  if (!email) {
+    throw new ApiError(401, "Email is required");
   }
 
   const user = await users
-    .findById(userId)
+    .findOne({ email })
     .select(
       "-password -refreshToken -forgotPasswordToken -forgotPasswordTokenExpiry -emailVerificationToken -emailVerificationTokenExpiry"
     );
@@ -279,11 +281,7 @@ const changePasswordService = async (
     throw new ApiError(404, "All fields are required");
   }
 
-  const user = await users
-    .findById(userId)
-    .select(
-      "-password -refreshToken -forgotPasswordToken -forgotPasswordTokenExpiry -emailVerificationToken -emailVerificationTokenExpiry"
-    );
+  const user = await users.findById(userId);
 
   if (!user) {
     throw new ApiError(404, "User not found");
@@ -298,7 +296,13 @@ const changePasswordService = async (
   user.password = newPassword;
   await user.save({ validateBeforeSave: false });
 
-  return { user };
+  const updatedUser = await users
+    .findById(user._id)
+    .select(
+      "-password -refreshToken -forgotPasswordToken -forgotPasswordTokenExpiry -emailVerificationToken -emailVerificationTokenExpiry"
+    );
+
+  return { user: updatedUser };
 };
 
 export {

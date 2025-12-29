@@ -142,9 +142,10 @@ const forgotPasswordRequest = asyncHandler(
 
 const resendForgotPasswordMail = asyncHandler(
   async (req: Request, res: Response) => {
-    const { _id } = req?.user as { _id: string };
+    // console.log(req?.user)
+    const {email} = req.body as {email: string};
 
-    const { user, unhashedToken } = await resendForgotPasswordService(_id);
+    const { user, unhashedToken } = await resendForgotPasswordService(email);
 
     sendEmail({
       mail: user.email,

@@ -1,9 +1,9 @@
 import http from "http";
 import dotenv from "dotenv";
-import app from "./app.ts";
-import { connectDB } from "./config/db.ts";
+import app from "./app";
+import { connectDB } from "./config/db";
 import { Server } from "socket.io";
-import { intiSocket } from "./sockets/index.ts";
+import { intiSocket } from "./sockets/index";
 
 const PORT = process.env.PORT || 3000;
 

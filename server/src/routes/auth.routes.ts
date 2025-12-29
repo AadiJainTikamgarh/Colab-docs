@@ -4,6 +4,7 @@ import {
   loginValidator,
   changePasswordValidator,
   forgotPasswordRequestValidator,
+  resendForgotPasswordMailValidator,
 } from "../validators/auth.validators";
 import { authorization } from "../middlewares/auth.middleware";
 import { validate } from "../middlewares/validator.middleware";
@@ -46,7 +47,13 @@ router.route("/verify-email/:unhashedToken").get(verifyEmail);
 router
   .route("/resend-verification-mail")
   .get(authorization, resendEmailVerificationMail);
-router.route("/resend-forgot-password-mail").get(resendForgotPasswordMail);
+router
+  .route("/resend-forgot-password-mail")
+  .post(
+    resendForgotPasswordMailValidator(),
+    validate,
+    resendForgotPasswordMail
+  );
 router.route("/refresh-access-token").get(authorization, refreshAccessToken);
 router.route("/current-user").get(authorization, currentUser);
 router.route("/logout").post(authorization, logout);
