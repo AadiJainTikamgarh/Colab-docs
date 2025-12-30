@@ -1,62 +1,60 @@
-import { useEffect, useState } from "react";
-import type { FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 import { useAuthStore } from "../store/auth.store";
 import { useNavigate, Link } from "react-router-dom";
 
-export default function Register() {
-  const [formData, setFormData] = useState({
-    username: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-  });
+export default function ChangePassword() {
+  const [oldPassword, setOldPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showPasswordInfo, setShowPasswordInfo] = useState(false);
 
-  const { register, isAuthenticated } = useAuthStore();
+  const changePassword = useAuthStore((state) => state.changePassword);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      navigate("/");
-    }
-  }, [isAuthenticated]);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError("");
+    setSuccess("");
 
-    // Validation
-    if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match");
+    // Validate password match
+    if (newPassword !== confirmPassword) {
+      setError("New passwords do not match");
       return;
     }
 
-    if (formData.password.length < 8) {
-      setError("Password must be at least 8 characters long");
+    // Validate password length
+    if (newPassword.length < 8) {
+      setError("New password must be at least 8 characters long");
+      return;
+    }
+
+    // Validate old and new password are different
+    if (oldPassword === newPassword) {
+      setError("New password must be different from old password");
       return;
     }
 
     setIsLoading(true);
 
     try {
-      await register({
-        username: formData.username,
-        email: formData.email,
-        password: formData.password,
-      });
-      navigate("/login");
+      await changePassword({ oldPassword, newPassword });
+      setSuccess("Password changed successfully!");
+      setOldPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+
+      // Redirect to home after 2 seconds
+      setTimeout(() => {
+        navigate("/");
+      }, 2000);
     } catch (err: any) {
+      console.log(err);
       setError(
-        err.response?.data?.message || "Registration failed. Please try again."
+        err.response?.data?.message ||
+          "Failed to change password. Please try again."
       );
     } finally {
       setIsLoading(false);
@@ -68,16 +66,10 @@ export default function Register() {
       <div className="max-w-md w-full space-y-6 sm:space-y-8">
         <div>
           <h2 className="text-center text-2xl sm:text-3xl font-bold text-gray-900">
-            Create your account
+            Change your password
           </h2>
           <p className="mt-2 text-center text-xs sm:text-sm text-gray-600">
-            Or{" "}
-            <Link
-              to="/login"
-              className="font-medium text-blue-600 hover:text-blue-500"
-            >
-              sign in to your existing account
-            </Link>
+            Enter your current password and choose a new one
           </p>
         </div>
 
@@ -91,54 +83,40 @@ export default function Register() {
             </div>
           )}
 
+          {success && (
+            <div className="bg-green-50 border border-green-200 text-green-700 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg text-sm">
+              {success}
+            </div>
+          )}
+
           <div className="space-y-3 sm:space-y-4">
             <div>
               <label
-                htmlFor="username"
+                htmlFor="oldPassword"
                 className="block text-sm font-medium text-gray-700"
               >
-                Username
+                Current Password
               </label>
               <input
-                id="username"
-                name="username"
-                type="text"
-                autoComplete="name"
+                id="oldPassword"
+                name="oldPassword"
+                type="password"
+                autoComplete="current-password"
                 required
-                value={formData.username}
-                onChange={handleChange}
+                value={oldPassword}
+                onChange={(e) => setOldPassword(e.target.value)}
                 className="mt-1 block w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="user2134"
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Email address
-              </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="email"
-                required
-                value={formData.email}
-                onChange={handleChange}
-                className="mt-1 block w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="you@example.com"
+                placeholder="••••••••"
               />
             </div>
 
             <div>
               <div className="flex items-center justify-between">
                 <label
-                  htmlFor="password"
+                  htmlFor="newPassword"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Password
+                  New Password
                 </label>
                 <button
                   type="button"
@@ -162,13 +140,13 @@ export default function Register() {
                 </button>
               </div>
               <input
-                id="password"
-                name="password"
+                id="newPassword"
+                name="newPassword"
                 type="password"
                 autoComplete="new-password"
                 required
-                value={formData.password}
-                onChange={handleChange}
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
                 className="mt-1 block w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="••••••••"
               />
@@ -204,7 +182,7 @@ export default function Register() {
                 htmlFor="confirmPassword"
                 className="block text-sm font-medium text-gray-700"
               >
-                Confirm password
+                Confirm New Password
               </label>
               <input
                 id="confirmPassword"
@@ -212,45 +190,31 @@ export default function Register() {
                 type="password"
                 autoComplete="new-password"
                 required
-                value={formData.confirmPassword}
-                onChange={handleChange}
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
                 className="mt-1 block w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="••••••••"
               />
             </div>
           </div>
 
-          <div className="flex items-center">
-            <input
-              id="terms"
-              name="terms"
-              type="checkbox"
-              required
-              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-            />
-            <label
-              htmlFor="terms"
-              className="ml-2 block text-xs sm:text-sm text-gray-700"
-            >
-              I agree to the{" "}
-              <Link to="/terms" className="text-blue-600 hover:text-blue-500">
-                Terms of Service
-              </Link>{" "}
-              and{" "}
-              <Link to="/privacy" className="text-blue-600 hover:text-blue-500">
-                Privacy Policy
-              </Link>
-            </label>
-          </div>
-
           <div>
             <button
               type="submit"
-              disabled={isLoading}
+              disabled={isLoading || success !== ""}
               className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              {isLoading ? "Creating account..." : "Create account"}
+              {isLoading ? "Changing password..." : "Change password"}
             </button>
+          </div>
+
+          <div className="text-center">
+            <Link
+              to="/"
+              className="font-medium text-blue-600 hover:text-blue-500 text-sm"
+            >
+              Back to home
+            </Link>
           </div>
         </form>
       </div>

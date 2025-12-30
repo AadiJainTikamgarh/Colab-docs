@@ -1,29 +1,33 @@
 import { useState, type FormEvent } from "react";
-import { useAuthStore } from "../store/auth.store";
-import { useNavigate, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
+import api from "../services/api";
 
-export default function Login() {
+export default function ForgotPassword() {
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-
-  const { login } = useAuthStore();
-  const navigate = useNavigate();
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError("");
+    setSuccess("");
     setIsLoading(true);
 
     try {
-      await login({ email, password });
-      setTimeout(() => {}, 3000);
-      navigate("/");
+      const response = await api.post("/auth/resend-forgot-password-mail", {
+        email,
+      });
+      setSuccess(
+        response.data?.message ||
+          "Password reset link has been sent to your email address."
+      );
+      setEmail("");
     } catch (err: any) {
       console.log(err);
       setError(
-        err.response?.data?.message || "Login failed. Please try again."
+        err.response?.data?.message ||
+          "Failed to send reset link. Please try again."
       );
     } finally {
       setIsLoading(false);
@@ -35,16 +39,11 @@ export default function Login() {
       <div className="max-w-md w-full space-y-6 sm:space-y-8">
         <div>
           <h2 className="text-center text-2xl sm:text-3xl font-bold text-gray-900">
-            Sign in to your account
+            Forgot your password?
           </h2>
           <p className="mt-2 text-center text-xs sm:text-sm text-gray-600">
-            Or{" "}
-            <Link
-              to="/register"
-              className="font-medium text-blue-600 hover:text-blue-500"
-            >
-              create a new account
-            </Link>
+            Enter your email address and we'll send you a link to reset your
+            password.
           </p>
         </div>
 
@@ -55,6 +54,12 @@ export default function Login() {
           {error && (
             <div className="bg-red-50 border border-red-200 text-red-700 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg text-sm">
               {error}
+            </div>
+          )}
+
+          {success && (
+            <div className="bg-green-50 border border-green-200 text-green-700 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg text-sm">
+              {success}
             </div>
           )}
 
@@ -78,52 +83,6 @@ export default function Login() {
                 placeholder="you@example.com"
               />
             </div>
-
-            <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Password
-              </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="current-password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="••••••••"
-              />
-            </div>
-          </div>
-
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
-            <div className="flex items-center">
-              <input
-                id="remember-me"
-                name="remember-me"
-                type="checkbox"
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-              />
-              <label
-                htmlFor="remember-me"
-                className="ml-2 block text-sm text-gray-700"
-              >
-                Remember me
-              </label>
-            </div>
-
-            <div className="text-sm">
-              <Link
-                to="/forgot-password"
-                className="font-medium text-blue-600 hover:text-blue-500"
-              >
-                Forgot your password?
-              </Link>
-            </div>
           </div>
 
           <div>
@@ -132,8 +91,17 @@ export default function Login() {
               disabled={isLoading}
               className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              {isLoading ? "Signing in..." : "Sign in"}
+              {isLoading ? "Sending..." : "Send reset link"}
             </button>
+          </div>
+
+          <div className="text-center">
+            <Link
+              to="/login"
+              className="font-medium text-blue-600 hover:text-blue-500 text-sm"
+            >
+              Back to login
+            </Link>
           </div>
         </form>
       </div>

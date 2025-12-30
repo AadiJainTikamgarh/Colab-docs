@@ -3,10 +3,20 @@ import Router from "./router";
 import { useAuthStore } from "../store/auth.store";
 
 function App() {
-  const user = useAuthStore((state) => state.user);
+  const fetchMe = useAuthStore((state) => state.fetchMe);
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+
   useEffect(() => {
-    console.log(user);
-  });
+    // Only validate session if user appears to be authenticated
+    // This reduces unnecessary API calls
+    if (isAuthenticated) {
+      fetchMe();
+    } else {
+      // Mark as loaded without API call
+      useAuthStore.setState({ isLoading: false });
+    }
+  }, []); // Only run once on mount
+
   return (
     <>
       <Router />
