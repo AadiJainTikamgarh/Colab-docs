@@ -61,10 +61,31 @@ const resendForgotPasswordMailValidator = () => {
   return [body("email").trim().isEmail().withMessage("Email is Invalid")];
 };
 
+const createDocumentValidator = () => {
+  return [body("title").trim().notEmpty().withMessage("Title is required")];
+};
+
+const updateDocumentValidator = () => {
+  return [body("data").notEmpty().withMessage("Data is required")];
+};
+
+const addCollaborationValidator = () => {
+  return [
+    body("collaboratorId")
+      .trim()
+      .notEmpty()
+      .withMessage("Collaborator ID is required"),
+    body("role").trim().notEmpty().withMessage("Role is required"),
+  ];
+};
+
 export {
   registerValidator,
   loginValidator,
   changePasswordValidator,
   forgotPasswordRequestValidator,
   resendForgotPasswordMailValidator,
+  createDocumentValidator,
+  updateDocumentValidator,
+  addCollaborationValidator,
 };

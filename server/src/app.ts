@@ -21,6 +21,9 @@ app.use(
 import healthCheckRouter from "./routes/healthcheck.routes";
 import authRouter from "./routes/auth.routes";
 import { errorHandler } from "./middlewares/errorHandler.middleware";
+import documentRouter from "./routes/document.routes";
+
+app.use("/api/v1/documents", documentRouter);
 
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/healthcheck", healthCheckRouter);

@@ -1,4 +1,4 @@
-import { HydratedDocument } from "mongoose";
+import { HydratedDocument, Mongoose } from "mongoose";
 
 declare global {
   namespace Mongoose {
@@ -26,6 +26,20 @@ declare global {
     }
 
     type UserDocument = HydratedDocument<User, UserMethods>;
+
+    interface Collaborator {
+      userId: Types.ObjectId;
+      role: "viewer" | "editor";
+      addedAt?: Date = Date.now();
+    }
+
+    interface IDocument {
+      title: string;
+      owner: Types.ObjectId;
+      collaborators: Mongoose.Collaborator[];
+      content: Record<string, any>;
+      version: number;
+    }
   }
 }
 

@@ -5,7 +5,7 @@ import {
   changePasswordValidator,
   forgotPasswordRequestValidator,
   resendForgotPasswordMailValidator,
-} from "../validators/auth.validators";
+} from "../validators/validators";
 import { authorization } from "../middlewares/auth.middleware";
 import { validate } from "../middlewares/validator.middleware";
 import {
