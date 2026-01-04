@@ -26,6 +26,7 @@ const documentSchema = new Schema(
     title: {
       type: String,
       require: true,
+      unique: true,
     },
     content: {
       type: Schema.Types.Mixed,
@@ -49,7 +50,7 @@ const documentSchema = new Schema(
   { timestamps: true }
 );
 
-documentSchema.index({ ownerId: 1 });
+documentSchema.index({ owner: 1 });
 documentSchema.index({ "collaborators.userId": 1 });
 
 export const documents = mongoose.model<Mongoose.IDocument>(

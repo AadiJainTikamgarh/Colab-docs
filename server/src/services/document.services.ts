@@ -27,7 +27,7 @@ const createDocumentService = async (
 };
 
 const getUserDocumentService = async (userId: string) => {
-  if (userId) {
+  if (!userId) {
     throw new ApiError(401, "userId required");
   }
 
@@ -41,7 +41,9 @@ const getDocumentByIdService = async (userId: string, docId: string) => {
     throw new ApiError(404, "All details are required");
   }
 
-  const docs = await documents.findOne({ owner: userId, _id: docId });
+  const docs = await documents
+    .findOne({ owner: userId, _id: docId })
+    .populate("collaborators.userId", "name email");
 
   return { docs };
 };
@@ -71,10 +73,10 @@ const updateDocumentService = async (
 const addCollaborationService = async (
   userId: string,
   docId: string,
-  collaboratorId: string,
+  collaboratorEmail: string,
   role: "viewer" | "editor"
 ) => {
-  if (!userId || !docId || !collaboratorId || !role) {
+  if (!userId || !docId || !collaboratorEmail || !role) {
     throw new ApiError(404, "All fields are required");
   }
 
@@ -82,11 +84,8 @@ const addCollaborationService = async (
     throw new ApiError(400, "Role must be either viewer or editor");
   }
 
-  if (collaboratorId === userId) {
-    throw new ApiError(400, "Owner cannot be added as collaborator");
-  }
-
-  const collaboratorUser = await users.findById(collaboratorId);
+  const collaboratorUser = await users.findOne({ email: collaboratorEmail });
+  const collaboratorId = collaboratorUser?._id;
 
   if (!collaboratorUser) {
     throw new ApiError(404, "Collaborator user not found");

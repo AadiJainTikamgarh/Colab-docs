@@ -59,7 +59,7 @@ const updateDocument = asyncHandler(async (req: Request, res: Response) => {
 
 const addCollaboration = asyncHandler(async (req: Request, res: Response) => {
   const { _id } = req.user as { _id: string };
-  const { role, collaboratorId } = req.body;
+  const { role, collaboratorEmail } = req.body;
   const { docId } = req.params as {
     docId: string;
   };
@@ -67,7 +67,7 @@ const addCollaboration = asyncHandler(async (req: Request, res: Response) => {
   const { docs } = await addCollaborationService(
     _id,
     docId,
-    collaboratorId,
+    collaboratorEmail,
     role
   );
 
