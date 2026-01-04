@@ -64,6 +64,7 @@ const updateDocumentService = async (
   }
 
   docs.content = data;
+  docs.version += 1;
 
   await docs.save({ validateBeforeSave: false });
 

@@ -52,7 +52,7 @@ export const useAuthStore = create<AuthState>()(
             email: data.email,
             password: data.password,
           });
-          console.log(res.data.data.user);
+          // console.log(res.data.data.user);
           set({
             user: res.data?.data?.user,
             isAuthenticated: true,

@@ -34,8 +34,11 @@ const useDocumentStore = create<DocumentState>()(
       fetchUserDocuments: async () => {
         set({ isLoading: true });
         try {
-          const response = await api.get<{ docs: Document[] }>("/documents");
-          set({ documents: response.data?.docs, isLoading: false });
+          const response = await api.get<{ data: { docs: Document[] } }>(
+            "/documents"
+          );
+
+          set({ documents: response.data?.data?.docs, isLoading: false });
         } catch (error) {
           console.log(error);
           set({ isLoading: false });
@@ -50,14 +53,15 @@ const useDocumentStore = create<DocumentState>()(
         set({ isLoading: true });
         try {
           // TODO: Implement create logic
-          const response = await api.post<{ docs: Document }>("/documents", {
-            title,
-            data,
-          });
+          const response = await api.post<{ data: { docs: Document } }>(
+            "/documents",
+            {
+              title,
+              data,
+            }
+          );
           set({
-            documents: [...get().documents, response.data?.docs],
-            lastDocumentId: response.data?.docs._id,
-            lastDocument: response.data?.docs,
+            documents: [...get().documents, response.data?.data?.docs],
           });
           set({ isLoading: false });
         } catch (error) {
@@ -69,7 +73,7 @@ const useDocumentStore = create<DocumentState>()(
       updateDocument: async (docId: string, data: any) => {
         set({ isLoading: true });
         try {
-          const response = await api.put<{ docs: Document }>(
+          const response = await api.put<{ data: { docs: Document } }>(
             `/documents/${docId}`,
             {
               data,
@@ -77,10 +81,10 @@ const useDocumentStore = create<DocumentState>()(
           );
           set({
             documents: get().documents.map((doc) =>
-              doc._id === docId ? response.data?.docs : doc
+              doc._id === docId ? response.data?.data?.docs : doc
             ),
-            lastDocument: response.data?.docs,
-            lastDocumentId: response.data?.docs._id,
+            lastDocument: response.data?.data?.docs,
+            lastDocumentId: response.data?.data?.docs._id,
           });
           set({ isLoading: false });
         } catch (error) {
@@ -92,10 +96,10 @@ const useDocumentStore = create<DocumentState>()(
       getDocumentById: async (docId: string) => {
         set({ isLoading: true });
         try {
-          const response = await api.get<{ docs: Document }>(
+          const response = await api.get<{ data: { docs: Document } }>(
             `/documents/${docId}`
           );
-          console.log(response.data?.docs);
+          console.log(response.data?.data?.docs);
           set({ isLoading: false });
         } catch (error) {
           set({ isLoading: false });
@@ -124,20 +128,19 @@ const useDocumentStore = create<DocumentState>()(
       ) => {
         set({ isLoading: true });
         try {
-          const response = await api.post<{ docs: Document }>(
-            `/documents/${docId}/collaborators`,
-            {
-              collaboratorEmail,
-              role,
-            }
-          );
+          const response = await api.post<{
+            data: { docs: Document };
+          }>(`/documents/${docId}/collaborators`, {
+            collaboratorEmail,
+            role,
+          });
           set({
             documents: get().documents.map((doc) =>
-              doc._id === docId ? response.data?.docs : doc
+              doc._id === docId ? response.data?.data?.docs : doc
             ),
             isLoading: false,
-            lastDocument: response.data?.docs,
-            lastDocumentId: response.data?.docs._id,
+            lastDocument: response.data?.data?.docs,
+            lastDocumentId: response.data?.data?.docs._id,
           });
         } catch (error) {
           set({ isLoading: false });
@@ -148,16 +151,16 @@ const useDocumentStore = create<DocumentState>()(
       removeCollaborator: async (docId: string, collaboratorId: string) => {
         set({ isLoading: true });
         try {
-          const response = await api.delete<{ docs: Document }>(
+          const response = await api.delete<{ data: { docs: Document } }>(
             `/documents/${docId}/collaborators/${collaboratorId}`
           );
           set({
             documents: get().documents.map((doc) =>
-              doc._id === docId ? response.data?.docs : doc
+              doc._id === docId ? response.data?.data?.docs : doc
             ),
             isLoading: false,
-            lastDocument: response.data?.docs,
-            lastDocumentId: response.data?.docs._id,
+            lastDocument: response.data?.data?.docs,
+            lastDocumentId: response.data?.data?.docs._id,
           });
         } catch (error) {
           set({ isLoading: false });

@@ -2,6 +2,8 @@ import { Routes, Route } from "react-router-dom";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
 import Home from "../pages/Home";
+import Dashboard from "../pages/Dashboard";
+import DocumentEditor from "../pages/DocumentEditor";
 import ForgotPassword from "../pages/ForgotPassword";
 import ResetPassword from "../pages/ResetPassword";
 import ChangePassword from "../pages/ChangePassword";
@@ -14,6 +16,8 @@ function Router() {
     <Routes>
       <Route element={<AuthorizedRoute />}>
         <Route path="/" element={<Home />} />
+        <Route path="dashboard" element={<Dashboard />} />
+        <Route path="document/:docId" element={<DocumentEditor />} />
         <Route path="change-password" element={<ChangePassword />} />
       </Route>
       <Route element={<UnAuthorizedRoute />}>
