@@ -1,0 +1,9 @@
+:80 {
+    root * /srv
+    file_server
+    
+    @api {
+        path /api/*
+    }
+    reverse_proxy @api server:5000
+}

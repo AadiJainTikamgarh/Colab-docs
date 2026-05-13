@@ -14,8 +14,6 @@
     "concurrently": "^9.2.1"
   },
   "dependencies": {
-    "bcryptjs": "^3.0.3",
-    "jsonwebtoken": "^9.0.3",
     "mailgen": "^2.0.32",
     "nodemailer": "^7.0.12"
   }

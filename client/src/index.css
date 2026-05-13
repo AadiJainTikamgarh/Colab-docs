@@ -1,1 +1,10 @@
+@import "./styles/_variables.scss";
+@import "./styles/_keyframe-animations.scss";
+
 @import "tailwindcss";
+
+/* Fallback: target all pagination wrappers */
+[class*="pagination"] {
+  /* border: none !important; */
+  outline: none !important;
+}

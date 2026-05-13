@@ -17,8 +17,8 @@ function Router() {
       <Route element={<AuthorizedRoute />}>
         <Route path="/" element={<Home />} />
         <Route path="dashboard" element={<Dashboard />} />
-        <Route path="document/:docId" element={<DocumentEditor />} />
         <Route path="change-password" element={<ChangePassword />} />
+        <Route path="document/:docId" element={<DocumentEditor />} />
       </Route>
       <Route element={<UnAuthorizedRoute />}>
         <Route path="login" element={<Login />} />

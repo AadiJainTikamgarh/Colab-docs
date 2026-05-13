@@ -8,6 +8,7 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
+      "@": path.resolve(__dirname, "src"),
       "@app": path.resolve(__dirname, "src/app"),
       "@pages": path.resolve(__dirname, "src/pages"),
       "@components": path.resolve(__dirname, "src/components"),
@@ -18,7 +19,14 @@ export default defineConfig({
       "@utils": path.resolve(__dirname, "src/utils"),
       "@styles": path.resolve(__dirname, "src/styles"),
       "@constants": path.resolve(__dirname, "src/constants"),
-      "@": path.resolve(__dirname, "src"),
     },
+  },
+  server: {
+    host: true,
+    port: 5173,
+  },
+  preview: {
+    host: true,
+    port: 4173,
   },
 });

@@ -11,6 +11,16 @@ Currently, two official plugins are available:
 
 The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
 
+## Cloudinary Image Uploads
+
+The image upload editor integration expects these Vite env vars:
+
+- `VITE_CLOUDINARY_CLOUD_NAME`
+- `VITE_CLOUDINARY_UPLOAD_PRESET`
+- `VITE_CLOUDINARY_FOLDER` (optional)
+
+The upload preset should be configured for unsigned uploads in Cloudinary.
+
 ## Expanding the ESLint configuration
 
 If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:

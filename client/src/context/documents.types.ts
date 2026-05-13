@@ -14,7 +14,7 @@ export interface Document {
   title: string;
   ownerId: string;
   collaborators: Collaborator[];
-  content: Record<string, any>;
+  content: any;
   version: number;
   createdAt: string;
   updatedAt: string;

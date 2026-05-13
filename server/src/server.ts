@@ -4,10 +4,10 @@ import app from "./app";
 import { connectDB } from "./config/db";
 import { Server } from "socket.io";
 import { intiSocket } from "./sockets/index";
+dotenv.config();
 
 const PORT = process.env.PORT || 3000;
 
-dotenv.config();
 connectDB();
 
 const server = http.createServer(app);
@@ -18,6 +18,6 @@ const io = new Server(server, {
 
 intiSocket(io);
 
-server.listen(PORT, () => {
+server.listen(Number(PORT), "0.0.0.0", () => {
   console.log(`Server running on port ${PORT}`);
 });

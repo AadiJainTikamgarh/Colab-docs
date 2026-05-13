@@ -1,5 +1,15 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import {
+  Clock3,
+  FileText,
+  LogOut,
+  Plus,
+  Search,
+  Trash2,
+  Users,
+  X,
+} from "lucide-react";
 import { useAuthStore } from "../store/auth.store";
 import useDocumentStore from "../store/document.store";
 
@@ -11,6 +21,7 @@ export default function Dashboard() {
     fetchUserDocuments,
     createDocument,
     deleteDocument,
+    setLastDocument,
   } = useDocumentStore();
   const navigate = useNavigate();
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -22,8 +33,6 @@ export default function Dashboard() {
     fetchUserDocuments();
     // console.log(documents);
   }, [fetchUserDocuments]);
-
-  console.log("Dashboard render:", { documents, isLoading, user });
 
   const handleLogout = async () => {
     try {
@@ -62,6 +71,8 @@ export default function Dashboard() {
   };
 
   const handleNavigateToDocument = (docId: string) => {
+    const docs = documents.find((doc) => doc._id === docId);
+    setLastDocument(docs as any);
     navigate(`/document/${docId}`);
   };
 
@@ -74,51 +85,33 @@ export default function Dashboard() {
   };
 
   return (
-    <div style={{ minHeight: "100vh", backgroundColor: "#f9fafb" }}>
-      {/* Navigation */}
-      <nav
-        style={{
-          backgroundColor: "white",
-          boxShadow: "0 1px 3px 0 rgba(0, 0, 0, 0.1)",
-        }}
-      >
-        <div style={{ maxWidth: "80rem", margin: "0 auto", padding: "0 1rem" }}>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              height: "4rem",
-              alignItems: "center",
-            }}
-          >
-            <div>
-              <h1
-                style={{
-                  fontSize: "1.25rem",
-                  fontWeight: "bold",
-                  color: "#111827",
-                }}
-              >
-                Colab Docs
-              </h1>
+    <div className="min-h-screen bg-[#eef1f5] text-slate-900">
+      <nav className="sticky top-0 z-30 border-b border-slate-200/80 bg-white/95 shadow-[0_12px_40px_-34px_rgba(15,23,42,0.55)] backdrop-blur">
+        <div className="mx-auto max-w-[1440px] px-3 sm:px-5 lg:px-8">
+          <div className="flex min-h-16 flex-wrap items-center justify-between gap-3 py-3">
+            <div className="flex min-w-0 items-center gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-slate-900 text-white shadow-sm">
+                <FileText className="h-5 w-5" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                  Workspace
+                </p>
+                <h1 className="truncate text-lg font-semibold leading-6 text-slate-950 sm:text-xl">
+                  Colab Docs
+                </h1>
+              </div>
             </div>
-            <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-              <span style={{ color: "#374151" }}>
+
+            <div className="flex items-center gap-2">
+              <span className="hidden rounded-md border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-600 shadow-sm sm:inline-flex">
                 Welcome, {user?.username || "User"}
               </span>
               <button
                 onClick={handleLogout}
-                style={{
-                  padding: "0.5rem 1rem",
-                  fontSize: "0.875rem",
-                  fontWeight: "500",
-                  color: "white",
-                  backgroundColor: "#2563eb",
-                  borderRadius: "0.5rem",
-                  border: "none",
-                  cursor: "pointer",
-                }}
+                className="inline-flex h-10 items-center gap-2 rounded-md border border-slate-200 bg-white px-3 text-sm font-medium text-slate-700 shadow-sm transition-colors hover:border-slate-300 hover:bg-slate-50 hover:text-slate-950 focus:outline-none focus:ring-2 focus:ring-slate-300"
               >
+                <LogOut className="h-4 w-4" />
                 Logout
               </button>
             </div>
@@ -126,160 +119,97 @@ export default function Dashboard() {
         </div>
       </nav>
 
-      {/* Main Content */}
-      <main
-        style={{ maxWidth: "80rem", margin: "0 auto", padding: "2rem 1rem" }}
-      >
-        {/* Header */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginBottom: "1.5rem",
-          }}
-        >
-          <div>
-            <h2
-              style={{
-                fontSize: "1.875rem",
-                fontWeight: "bold",
-                color: "#111827",
-              }}
-            >
+      <main className="mx-auto max-w-[1440px] px-3 py-6 sm:px-5 lg:px-8">
+        <div className="mb-6 flex flex-col gap-4 rounded-lg border border-slate-200/80 bg-white/80 p-4 shadow-[0_18px_60px_-46px_rgba(15,23,42,0.65)] backdrop-blur sm:p-5 lg:flex-row lg:items-center lg:justify-between">
+          <div className="min-w-0">
+            <p className="text-sm font-medium text-slate-500">
+              {documents?.length}{" "}
+              {documents?.length === 1 ? "document" : "documents"} available
+            </p>
+            <h2 className="mt-1 text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">
               My Documents
             </h2>
-            <p style={{ color: "#4b5563", marginTop: "0.25rem" }}>
-              {documents?.length}{" "}
-              {documents?.length === 1 ? "document" : "documents"}
-            </p>
           </div>
-          <button
-            onClick={() => setShowCreateModal(true)}
-            style={{
-              padding: "0.75rem 1.5rem",
-              fontSize: "0.875rem",
-              fontWeight: "500",
-              color: "white",
-              backgroundColor: "#2563eb",
-              borderRadius: "0.5rem",
-              border: "none",
-              cursor: "pointer",
-              boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
-            }}
-          >
-            + New Document
-          </button>
+
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+            <div className="flex h-11 min-w-0 items-center gap-2 rounded-md border border-slate-200 bg-white px-3 text-slate-500 shadow-sm sm:w-72">
+              <Search className="h-4 w-4 shrink-0" />
+              <span className="truncate text-sm">Select a document to edit</span>
+            </div>
+            <button
+              onClick={() => setShowCreateModal(true)}
+              className="inline-flex h-11 items-center justify-center gap-2 rounded-md bg-slate-900 px-4 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-400"
+            >
+              <Plus className="h-4 w-4" />
+              New Document
+            </button>
+          </div>
         </div>
 
-        {/* Loading State */}
         {isLoading && documents?.length === 0 && (
-          <div className="flex justify-center items-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          <div className="flex justify-center py-16">
+            <div className="h-11 w-11 animate-spin rounded-full border-2 border-slate-300 border-t-slate-900"></div>
           </div>
         )}
 
-        {/* Empty State */}
         {!isLoading && documents?.length === 0 && (
-          <div className="bg-white rounded-lg shadow p-12 text-center">
-            <svg
-              className="mx-auto h-12 w-12 text-gray-400"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-              />
-            </svg>
-            <h3 className="mt-4 text-lg font-medium text-gray-900">
+          <div className="mx-auto max-w-xl rounded-lg border border-dashed border-slate-300 bg-white/70 p-10 text-center shadow-[0_18px_60px_-48px_rgba(15,23,42,0.7)]">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-md bg-slate-900 text-white">
+              <FileText className="h-7 w-7" />
+            </div>
+            <h3 className="mt-5 text-lg font-semibold text-slate-950">
               No documents yet
             </h3>
-            <p className="mt-2 text-gray-600">
+            <p className="mt-2 text-sm text-slate-600">
               Get started by creating your first document.
             </p>
             <button
               onClick={() => setShowCreateModal(true)}
-              className="mt-6 px-6 py-3 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+              className="mt-6 inline-flex h-11 items-center justify-center gap-2 rounded-md bg-slate-900 px-4 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-400"
             >
+              <Plus className="h-4 w-4" />
               Create Document
             </button>
           </div>
         )}
 
-        {/* Documents Grid */}
         {documents?.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
             {documents.map((doc) => (
               <div
                 key={doc._id}
                 onClick={() => handleNavigateToDocument(doc._id)}
-                className="bg-white rounded-lg shadow hover:shadow-lg transition-shadow cursor-pointer group"
+                className="group cursor-pointer rounded-lg border border-slate-200 bg-white shadow-[0_18px_58px_-44px_rgba(15,23,42,0.9)] transition-all hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-[0_24px_70px_-42px_rgba(15,23,42,0.85)]"
               >
-                <div className="p-6">
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="flex-1">
-                      <h3 className="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-2">
+                <div className="p-5">
+                  <div className="mb-4 flex items-start justify-between gap-3">
+                    <div className="flex min-w-0 gap-3">
+                      <div className="flex h-11 w-9 shrink-0 items-center justify-center rounded-sm border border-slate-200 bg-[#f8fafc] text-slate-500 shadow-sm">
+                        <FileText className="h-4 w-4" />
+                      </div>
+                      <h3 className="line-clamp-2 text-lg font-semibold leading-6 text-slate-950 transition-colors group-hover:text-slate-700">
                         {doc.title}
                       </h3>
                     </div>
                     <button
                       onClick={(e) => handleDeleteDocument(doc._id, e)}
-                      className="ml-2 p-1 text-gray-400 hover:text-red-600 transition-colors"
+                      className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-slate-400 transition-colors hover:bg-red-50 hover:text-red-600 focus:outline-none focus:ring-2 focus:ring-red-200"
                       title="Delete document"
+                      aria-label={`Delete ${doc.title}`}
                     >
-                      <svg
-                        className="w-5 h-5"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                        />
-                      </svg>
+                      <Trash2 className="h-4 w-4" />
                     </button>
                   </div>
 
-                  <div className="space-y-2 text-sm text-gray-600">
-                    <div className="flex items-center">
-                      <svg
-                        className="w-4 h-4 mr-2"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                        />
-                      </svg>
+                  <div className="space-y-2 text-sm text-slate-600">
+                    <div className="flex items-center gap-2">
+                      <Clock3 className="h-4 w-4 text-slate-400" />
                       <span>Updated {formatDate(doc.updatedAt)}</span>
                     </div>
 
                     {doc.collaborators && doc.collaborators.length > 0 && (
-                      <div className="flex items-center">
-                        <svg
-                          className="w-4 h-4 mr-2"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
-                          />
-                        </svg>
+                      <div className="flex items-center gap-2">
+                        <Users className="h-4 w-4 text-slate-400" />
                         <span>
                           {doc.collaborators.length}{" "}
                           {doc.collaborators.length === 1
@@ -291,9 +221,12 @@ export default function Dashboard() {
                   </div>
                 </div>
 
-                <div className="px-6 py-3 bg-gray-50 rounded-b-lg border-t border-gray-100">
-                  <span className="text-xs text-gray-500">
+                <div className="flex items-center justify-between border-t border-slate-100 bg-slate-50/80 px-5 py-3">
+                  <span className="text-xs font-medium text-slate-500">
                     Version {doc.version}
+                  </span>
+                  <span className="text-xs font-semibold text-slate-500 transition-colors group-hover:text-slate-900">
+                    Open
                   </span>
                 </div>
               </div>
@@ -305,22 +238,45 @@ export default function Dashboard() {
       {/* Create Document Modal */}
       {showCreateModal && (
         <div
-          className="fixed inset-0 bg-opacity-20 flex items-center justify-center p-4 z-50"
-          style={{ backdropFilter: "blur(8px)" }}
-          onClick={(e) => e.target === e.currentTarget && e.preventDefault()}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/20 p-4 backdrop-blur-sm"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setShowCreateModal(false);
+              setNewDocTitle("");
+            }
+          }}
         >
           <div
-            className="bg-white rounded-lg shadow-xl max-w-md w-full p-6"
+            className="w-full max-w-md rounded-lg border border-slate-200 bg-white p-5 shadow-[0_30px_90px_-45px_rgba(15,23,42,0.9)]"
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="text-xl font-bold text-gray-900 mb-4">
-              Create New Document
-            </h3>
+            <div className="mb-5 flex items-start justify-between gap-3">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                  New file
+                </p>
+                <h3 className="mt-1 text-xl font-semibold text-slate-950">
+                  Create Document
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowCreateModal(false);
+                  setNewDocTitle("");
+                }}
+                className="inline-flex h-9 w-9 items-center justify-center rounded-md text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-950"
+                aria-label="Close modal"
+                disabled={isCreating}
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
             <form onSubmit={handleCreateDocument}>
-              <div className="mb-4">
+              <div className="mb-5">
                 <label
                   htmlFor="title"
-                  className="block text-sm font-medium text-gray-700 mb-2"
+                  className="mb-2 block text-sm font-medium text-slate-700"
                 >
                   Document Title
                 </label>
@@ -329,27 +285,27 @@ export default function Dashboard() {
                   id="title"
                   value={newDocTitle}
                   onChange={(e) => setNewDocTitle(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="h-11 w-full rounded-md border border-slate-300 px-3 text-slate-950 shadow-sm outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
                   placeholder="Enter document title..."
                   autoFocus
                   disabled={isCreating}
                 />
               </div>
-              <div className="flex justify-end space-x-3">
+              <div className="flex justify-end gap-3">
                 <button
                   type="button"
                   onClick={() => {
                     setShowCreateModal(false);
                     setNewDocTitle("");
                   }}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors"
+                  className="inline-flex h-10 items-center justify-center rounded-md border border-slate-200 bg-white px-4 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-300"
                   disabled={isCreating}
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="inline-flex h-10 items-center justify-center rounded-md bg-slate-900 px-4 text-sm font-semibold text-white transition-colors hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-400 disabled:cursor-not-allowed disabled:opacity-50"
                   disabled={isCreating || !newDocTitle.trim()}
                 >
                   {isCreating ? "Creating..." : "Create"}

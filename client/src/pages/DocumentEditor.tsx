@@ -1,7 +1,9 @@
 import { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { ArrowLeft, FileText, LogOut } from "lucide-react";
 import useDocumentStore from "../store/document.store";
 import { useAuthStore } from "../store/auth.store";
+import { SimpleEditor } from "@/components/tiptap-templates/simple/simple-editor";
 
 export default function DocumentEditor() {
   const { docId } = useParams<{ docId: string }>();
@@ -14,6 +16,22 @@ export default function DocumentEditor() {
       getDocumentById(docId);
     }
   }, [docId, getDocumentById]);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    const hadDarkClass = root.classList.contains("dark");
+    const previousColorScheme = root.style.colorScheme;
+
+    root.classList.remove("dark");
+    root.style.colorScheme = "light";
+
+    return () => {
+      root.style.colorScheme = previousColorScheme;
+      if (hadDarkClass) {
+        root.classList.add("dark");
+      }
+    };
+  }, []);
 
   const handleBack = () => {
     navigate("/dashboard");
@@ -29,40 +47,44 @@ export default function DocumentEditor() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Navigation */}
-      <nav className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex items-center space-x-4">
+    <div className="flex min-h-screen flex-col bg-[#eef1f5] text-slate-900">
+      <nav className="sticky top-0 z-30 border-b border-slate-200/80 bg-white/95 shadow-[0_12px_40px_-34px_rgba(15,23,42,0.55)] backdrop-blur">
+        <div className="mx-auto max-w-[1440px] px-3 sm:px-5 lg:px-8">
+          <div className="flex min-h-16 flex-wrap items-center justify-between gap-3 py-3">
+            <div className="flex min-w-0 items-center gap-3">
               <button
                 onClick={handleBack}
-                className="p-2 text-gray-600 hover:text-gray-900 rounded-lg hover:bg-gray-100 transition-colors"
+                className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-slate-200 bg-white text-slate-600 shadow-sm transition-colors hover:border-slate-300 hover:bg-slate-50 hover:text-slate-950 focus:outline-none focus:ring-2 focus:ring-slate-300"
                 title="Back to dashboard"
+                aria-label="Back to dashboard"
               >
-                <svg
-                  className="w-6 h-6"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M10 19l-7-7m0 0l7-7m-7 7h18"
-                  />
-                </svg>
+                <ArrowLeft className="h-5 w-5" />
               </button>
-              <h1 className="text-xl font-bold text-gray-900">
-                {lastDocument?.title || "Document"}
-              </h1>
+
+              <div className="flex min-w-0 items-center gap-3">
+                <div className="hidden h-10 w-10 shrink-0 items-center justify-center rounded-md bg-slate-900 text-white shadow-sm sm:flex">
+                  <FileText className="h-5 w-5" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                    Editing document
+                  </p>
+                  <h1 className="truncate text-lg font-semibold leading-6 text-slate-950 sm:text-xl">
+                    {lastDocument?.title || "Untitled document"}
+                  </h1>
+                </div>
+              </div>
             </div>
-            <div className="flex items-center space-x-4">
+
+            <div className="flex items-center gap-2">
+              <div className="hidden rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm font-medium text-emerald-700 sm:block">
+                Ready to edit
+              </div>
               <button
                 onClick={handleLogout}
-                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+                className="inline-flex h-10 items-center gap-2 rounded-md border border-slate-200 bg-white px-3 text-sm font-medium text-slate-700 shadow-sm transition-colors hover:border-slate-300 hover:bg-slate-50 hover:text-slate-950 focus:outline-none focus:ring-2 focus:ring-slate-300"
               >
+                <LogOut className="h-4 w-4" />
                 Logout
               </button>
             </div>
@@ -70,18 +92,14 @@ export default function DocumentEditor() {
         </div>
       </nav>
 
-      {/* Main Content */}
-      <main className="">
+      <main className="flex flex-1 overflow-hidden">
         {isLoading ? (
-          <div className="flex justify-center items-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          <div className="flex flex-1 items-center justify-center">
+            <div className="h-11 w-11 animate-spin rounded-full border-2 border-slate-300 border-t-slate-900"></div>
           </div>
         ) : (
-          <div className="max-w-5xl mx-auto p-4">
-            <textarea
-              className="w-full h-screen p-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
-              readOnly
-            />
+          <div className="mx-auto flex h-[calc(100vh-6rem)] w-full overflow-hidden">
+            <SimpleEditor docContent={lastDocument?.content as any} />
           </div>
         )}
       </main>

@@ -1,0 +1,57 @@
+name: colab-docs
+
+services:
+  mongo:
+    image: mongo:latest
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - colab-docs
+
+  server:
+    build:
+      context: ./server
+      dockerfile: DockerFile
+    restart: unless-stopped
+    env_file: ./server/.env
+    depends_on:
+      - mongo
+    networks:
+      - colab-docs
+
+  client:
+    build:
+      context: ./client
+      dockerfile: DockerFile
+    restart: unless-stopped
+    networks:
+      - colab-docs
+    env_file:
+      - ./client/.env
+    depends_on:
+      - mongo
+      - server
+
+  caddy:
+    image: caddy:latest
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile
+      - ./client/dist:/srv
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - server
+    networks:
+      - colab-docs
+
+volumes:
+  mongo_data:
+  caddy_data:
+  caddy_config:
+
+networks:
+  colab-docs:
+    driver: bridge

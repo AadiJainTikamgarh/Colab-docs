@@ -1,7 +1,14 @@
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
+import { CheckCircle2, Loader2, XCircle } from "lucide-react";
 import api from "../services/api";
 import { useAuthStore } from "../store/auth.store";
+import {
+  AuthAlert,
+  AuthShell,
+  authPrimaryButtonClass,
+  authSecondaryLinkClass,
+} from "@/components/auth/AuthShell";
 
 export default function VerifyEmail() {
   const [status, setStatus] = useState<"loading" | "success" | "error">(
@@ -39,128 +46,62 @@ export default function VerifyEmail() {
     }
   }, [unhashedToken]);
 
+  const isSuccess = status === "success";
+  const isError = status === "error";
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
-      <div className="max-w-md w-full space-y-6 sm:space-y-8">
-        <div className="text-center">
+    <AuthShell
+      title={
+        status === "loading"
+          ? "Verifying your email"
+          : isSuccess
+            ? "Email verified"
+            : "Verification failed"
+      }
+      description={
+        status === "loading"
+          ? "Please wait while we confirm your email address."
+          : message
+      }
+    >
+      <div className="space-y-5 text-center lg:text-left">
+        <div className="flex justify-center lg:justify-start">
           {status === "loading" && (
-            <>
-              <div className="flex justify-center mb-4">
-                <svg
-                  className="animate-spin h-12 w-12 sm:h-16 sm:w-16 text-blue-600"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  ></circle>
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  ></path>
-                </svg>
-              </div>
-              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
-                Verifying your email...
-              </h2>
-              <p className="mt-2 text-xs sm:text-sm text-gray-600">
-                Please wait while we verify your email address
-              </p>
-            </>
+            <div className="flex h-14 w-14 items-center justify-center rounded-md bg-slate-900 text-white">
+              <Loader2 className="h-7 w-7 animate-spin" />
+            </div>
           )}
-
-          {status === "success" && (
-            <>
-              <div className="flex justify-center mb-4">
-                <div className="rounded-full bg-green-100 p-3 sm:p-4">
-                  <svg
-                    className="h-12 w-12 sm:h-16 sm:w-16 text-green-600"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
-                </div>
-              </div>
-              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
-                Email Verified!
-              </h2>
-              <p className="mt-2 text-xs sm:text-sm text-gray-600">{message}</p>
-              <div className="mt-6 sm:mt-8 space-y-3">
-                {!isAuthenticated && (
-                  <Link
-                    to="/login"
-                    className="block w-full py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
-                  >
-                    Sign in to your account
-                  </Link>
-                )}
-                <Link
-                  to="/"
-                  className="block w-full py-2.5 px-4 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
-                >
-                  Go to home
-                </Link>
-              </div>
-            </>
+          {isSuccess && (
+            <div className="flex h-14 w-14 items-center justify-center rounded-md bg-emerald-50 text-emerald-600 ring-1 ring-emerald-200">
+              <CheckCircle2 className="h-7 w-7" />
+            </div>
           )}
-
-          {status === "error" && (
-            <>
-              <div className="flex justify-center mb-4">
-                <div className="rounded-full bg-red-100 p-3 sm:p-4">
-                  <svg
-                    className="h-12 w-12 sm:h-16 sm:w-16 text-red-600"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
-                </div>
-              </div>
-              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
-                Verification Failed
-              </h2>
-              <p className="mt-2 text-xs sm:text-sm text-gray-600">{message}</p>
-              <div className="mt-6 sm:mt-8 space-y-3">
-                {!isAuthenticated && (
-                  <Link
-                    to="/login"
-                    className="block w-full py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
-                  >
-                    Go to login
-                  </Link>
-                )}
-                <Link
-                  to="/"
-                  className="block w-full py-2.5 px-4 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
-                >
-                  Go to home
-                </Link>
-              </div>
-            </>
+          {isError && (
+            <div className="flex h-14 w-14 items-center justify-center rounded-md bg-red-50 text-red-600 ring-1 ring-red-200">
+              <XCircle className="h-7 w-7" />
+            </div>
           )}
         </div>
+
+        {isSuccess && <AuthAlert tone="success">{message}</AuthAlert>}
+        {isError && <AuthAlert tone="error">{message}</AuthAlert>}
+
+        {status !== "loading" && (
+          <div className="space-y-3">
+            {!isAuthenticated && (
+              <Link to="/login" className={authPrimaryButtonClass}>
+                {isSuccess ? "Sign in to your account" : "Go to login"}
+              </Link>
+            )}
+            <Link
+              to="/"
+              className={`flex h-11 w-full items-center justify-center rounded-md border border-slate-200 bg-white px-4 text-sm ${authSecondaryLinkClass}`}
+            >
+              Go to home
+            </Link>
+          </div>
+        )}
       </div>
-    </div>
+    </AuthShell>
   );
 }
